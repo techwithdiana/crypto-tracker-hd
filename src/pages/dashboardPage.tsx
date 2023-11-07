@@ -4,21 +4,20 @@ import clsx from "clsx";
 import Arrow from "../assets/chevron_down.svg";
 import { useCoinTable } from "../utils/hooks";
 import TopPerforming from "../components/topPerforming";
-import { useRef } from "react";
 
 export default function DashboardPage() {
+  //useNavigate is a hook that lets you change pages without reloading the whole window
   const navigate = useNavigate();
   const { isLoading, data, table, setFilter } = useCoinTable();
-  const headerRef = useRef<HTMLTableSectionElement>(null);
 
   return (
     <div>
       <div className="w-full bg-[url('https://crypto-hunter.netlify.app/banner2.jpg')]">
-        <div className="max-w-[120rem] mx-auto p-16">
+        <div className="max-w-[120rem] mx-auto p-4 lg:p-16">
           <TopPerforming />
         </div>
       </div>
-      <div className="max-w-[120rem] mx-auto px-16 py-8 flex flex-col gap-8">
+      <div className="max-w-[120rem] mx-auto p-4 lg:p-16 py-8 flex flex-col gap-8">
         <div className="flex items-center gap-4">
           <input
             disabled={isLoading}
@@ -28,11 +27,15 @@ export default function DashboardPage() {
           />
           <button
             onClick={() => {
+              //This will get the selected rows from the table and
+              //trigger navigation to the comparison page if correct
+              //amount are selected
               const selected = table.getState().rowSelection;
               const coins = Object.keys(selected).filter(
                 (id) => !!selected[id]
               );
               if (coins.length >= 2 && coins.length <= 4) {
+                //the url will be built like /comparison?coins=bitcoin,etherium,doge
                 navigate(`/comparison?coins=${coins.join(",")}`);
               }
             }}
@@ -49,66 +52,68 @@ export default function DashboardPage() {
           </div>
         )}
         {!isLoading && (
-          <table className="w-full bg-slate-950 bg-opacity-50 rounded">
-            <thead ref={headerRef}>
-              {table.getHeaderGroups().map((group) => (
-                <tr key={group.id} className="bg-yellow-400">
-                  {group.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      className={clsx(
-                        "text-left px-5 py-4 text-sm select-none",
-                        {
-                          "text-right": header.index !== 0,
-                          "cursor-pointer hover:bg-yellow-500 transition-[background]":
-                            header.column.getCanSort(),
-                        }
-                      )}
-                      onClick={() => {
-                        if (header.column.getCanSort())
-                          header.column.toggleSorting();
-                      }}
-                    >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {header.column.getIsSorted() && (
-                        <img
-                          src={Arrow}
-                          className={clsx(
-                            "h-4 w-4 transition-transform inline-block ms-2",
-                            {
-                              "rotate-180":
-                                header.column.getIsSorted() === "asc",
-                            }
-                          )}
-                        />
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody className="text-white">
-              {table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  onClick={() => navigate(row.original.id)}
-                  className="hover:bg-slate-900 transition-[background] cursor-pointer border-t border-t-white border-opacity-10"
-                >
-                  {row.getAllCells().map((cell) => (
-                    <td key={cell.id} className="px-5 py-4">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="w-full overflow-x-auto lg:overflow-x-hidden">
+            <table className="w-full bg-slate-950 bg-opacity-50 rounded">
+              <thead>
+                {table.getHeaderGroups().map((group) => (
+                  <tr key={group.id} className="bg-yellow-400">
+                    {group.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        className={clsx(
+                          "text-left px-5 py-4 text-sm select-none",
+                          {
+                            "text-right": header.index !== 0,
+                            "cursor-pointer hover:bg-yellow-500 transition-[background]":
+                              header.column.getCanSort(),
+                          }
+                        )}
+                        onClick={() => {
+                          if (header.column.getCanSort())
+                            header.column.toggleSorting();
+                        }}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {header.column.getIsSorted() && (
+                          <img
+                            src={Arrow}
+                            className={clsx(
+                              "h-4 w-4 transition-transform inline-block ms-2",
+                              {
+                                "rotate-180":
+                                  header.column.getIsSorted() === "asc",
+                              }
+                            )}
+                          />
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody className="text-white">
+                {table.getRowModel().rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    onClick={() => navigate(row.original.id)}
+                    className="hover:bg-slate-900 transition-[background] cursor-pointer border-t border-t-white border-opacity-10"
+                  >
+                    {row.getAllCells().map((cell) => (
+                      <td key={cell.id} className="px-5 py-4">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
         {!!data?.length && (
           <div className="ms-auto flex gap-2 font-medium items-center">
@@ -132,7 +137,6 @@ export default function DashboardPage() {
             <button
               onClick={() => {
                 table.nextPage();
-                console.log(headerRef.current);
                 window.scrollTo({
                   behavior: "smooth",
                   top: 0,

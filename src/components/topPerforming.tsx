@@ -9,14 +9,15 @@ export default function TopPerforming() {
 
   if (isLoading || !data) {
     return (
-      <div className="w-full grid grid-cols-5 gap-4">
+      <div className="w-full flex flex-row lg:grid lg:grid-cols-5 gap-4">
         {Array.from(Array(5).keys()).map((i) => (
-          <div key={i} className="bg-slate-800 rounded animate-pulse h-40" />
+          <div key={i} className="min-w-[20rem] lg:min-w-0 bg-slate-800 rounded animate-pulse h-40" />
         ))}
       </div>
     );
   }
 
+  //Sorts the coins by 7d change in descending order and takes the first 5
   const coins = data
     .sort(
       (left, right) =>
@@ -28,12 +29,12 @@ export default function TopPerforming() {
   return (
     <div className="text-white">
       <div className="font-medium text-xl mb-4 text-center">Top Performers</div>
-      <div className="w-full grid grid-cols-5 gap-4">
+      <div className="w-full gap-4 flex flex-row overflow-x-auto lg:grid lg:grid-cols-5">
         {coins.map((coin) => (
           <div
             key={coin.id}
             onClick={() => navigate("/" + coin.id)}
-            className="border border-white border-opacity-50 rounded-lg p-3 text-opacity-75 hover:bg-white hover:bg-opacity-5 cursor-pointer transition-all"
+            className="min-w-[20rem] lg:min-w-0 border border-white border-opacity-50 rounded-lg p-3 text-opacity-75 hover:bg-white hover:bg-opacity-5 cursor-pointer transition-all"
           >
             <div className="flex gap-2 items-center mb-4">
               <img src={coin.image} className="w-6 h-6" />

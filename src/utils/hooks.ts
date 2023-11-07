@@ -16,14 +16,40 @@ import { useUserContext } from "./userContext";
 import ChartCell from "../components/chartCell";
 import useSWR from "swr";
 
+/**
+ *
+ * @param id Id of the Coin
+ * @returns Details for a single coin
+ */
 export function useCoin(id: string) {
+  /**
+   * useSWR is a handy library that manages a cache and all API calls for you
+   * if multiple pages or components all use the same API call, it will share the
+   * response and only call the API once
+   *
+   * you can also tell it to cache the API call for a certain amount of time or even
+   * things like refresh the API call when the user leaves the tab and comes back
+   *
+   * it also returns { isLoading, isValidation, data, error }
+   *
+   * isLoading is whether its the first time the call is loading
+   * isValidation is whether the call is being reloaded
+   * error is the error from the api call
+   * data is the data from the api call
+   */
   const { isLoading, data } = useSWR("coins/" + id, fetcher<CoinDetail>, {
+    //This will cache the API call for 60 seconds, if a page/component requests it again after
+    //60 seconds it will reload
     dedupingInterval: 60_000,
   });
 
   return { isLoading, data: data?.data };
 }
 
+/**
+ *
+ * @returns A list of all coins and their market values
+ */
 export function useCoins() {
   const { currency } = useUserContext();
 
@@ -38,6 +64,12 @@ export function useCoins() {
   return { isLoading, data: data?.data };
 }
 
+/**
+ *
+ * @param id The Coin Id
+ * @param days The days to return
+ * @returns A detailed market history of the coin
+ */
 export function useCoinHistory(id: string, days: number) {
   const { currency } = useUserContext();
 
@@ -52,11 +84,17 @@ export function useCoinHistory(id: string, days: number) {
   return { isLoading, data: data?.data };
 }
 
+/**
+ *
+ * @returns Builds and returns the data required for the coin table
+ */
 export function useCoinTable() {
   const { isLoading, data } = useCoins();
   const [filter, setFilter] = useState<string>("");
 
   const helper = createColumnHelper<CoinMarket>();
+
+  //useReactTable is a hook that manages all the sorting, filtering, pagination, and rendering for you
   const table = useReactTable<CoinMarket>({
     columns: [
       helper.accessor("name", {
@@ -108,4 +146,3 @@ export function useCoinTable() {
 
   return { isLoading, data, table, setFilter };
 }
-

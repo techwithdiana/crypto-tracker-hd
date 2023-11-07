@@ -18,10 +18,10 @@ export default function Chart({ id }: { id: string }) {
   return (
     <div>
       {(isLoading || !data) && (
-        <div className="bg-slate-800 rounded-lg w-full h-[600px] animate-pulse" />
+        <div className="bg-slate-800 rounded-lg w-full h-[500px] animate-pulse" />
       )}
       {!!data && (
-        <ResponsiveContainer height={600}>
+        <ResponsiveContainer height={500}>
           <LineChart
             data={data.prices.map((tick) => ({
               value: tick[1],
@@ -53,7 +53,8 @@ export default function Chart({ id }: { id: string }) {
           </LineChart>
         </ResponsiveContainer>
       )}
-      <div className="flex flex-row p-4 gap-6">
+      {/** This is just building the buttons based on the length/label */}
+      <div className="flex flex-row lg:p-4 gap-2 lg:gap-6">
         {[
           { length: 1, label: "24h" },
           { length: 7, label: "Last Week" },
@@ -78,3 +79,4 @@ export default function Chart({ id }: { id: string }) {
     </div>
   );
 }
+
